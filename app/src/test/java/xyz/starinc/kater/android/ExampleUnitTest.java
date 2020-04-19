@@ -1,4 +1,4 @@
-package org.flarum.flarum;
+package xyz.starinc.kater.android;
 
 import org.junit.Test;
 

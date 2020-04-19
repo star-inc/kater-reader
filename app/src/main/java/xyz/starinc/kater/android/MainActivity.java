@@ -1,4 +1,4 @@
-package org.flarum.flarum;
+package xyz.starinc.kater.android;
 
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -17,6 +17,9 @@ import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.ProgressBar;
+
+import xyz.starinc.kater.android.R;
+
 import im.delight.android.webview.AdvancedWebView;
 
 public class MainActivity extends AppCompatActivity implements AdvancedWebView.Listener{
@@ -24,7 +27,7 @@ public class MainActivity extends AppCompatActivity implements AdvancedWebView.L
     public AdvancedWebView webView;
     private ProgressBar mPbar = null;
 
-    private static final String  url = "https://discuss.flarum.org/";
+    private static final String  url = "https://kater.me/";
 	String webURL, webTitle ;
 
 

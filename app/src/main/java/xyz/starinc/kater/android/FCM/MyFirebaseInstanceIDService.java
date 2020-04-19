@@ -1,4 +1,4 @@
-package org.flarum.flarum.FCM;
+package xyz.starinc.kater.android.FCM;
 
 import android.content.Context;
 import android.content.SharedPreferences;

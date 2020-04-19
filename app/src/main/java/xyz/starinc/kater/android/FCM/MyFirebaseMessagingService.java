@@ -1,4 +1,4 @@
-package org.flarum.flarum.FCM;
+package xyz.starinc.kater.android.FCM;
 
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -11,8 +11,8 @@ import android.net.Uri;
 import android.preference.PreferenceManager;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
-import org.flarum.flarum.MainActivity;
-import org.flarum.flarum.R;
+import xyz.starinc.kater.android.MainActivity;
+import xyz.starinc.kater.android.R;
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
 

@@ -2,7 +2,7 @@
 
 身受許多年輕族群喜愛的匿名社群平台，立志於成為全台灣最多元、開放的社群平台！
 
-![logo](public/assets/simple-logo.svg)
+![logo](simple-logo.svg)
 
 ## Android客戶端
 
