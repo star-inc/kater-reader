@@ -1,5 +1,6 @@
 package xyz.starinc.kater.android;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Build;
@@ -19,8 +20,6 @@ import android.widget.ProgressBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
-import xyz.starinc.kater.android.R;
-
 import im.delight.android.webview.AdvancedWebView;
 
 public class MainActivity extends AppCompatActivity implements AdvancedWebView.Listener{
@@ -32,16 +31,17 @@ public class MainActivity extends AppCompatActivity implements AdvancedWebView.L
 	String webURL, webTitle ;
 
 
+    @SuppressLint("SetJavaScriptEnabled")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        mPbar = (ProgressBar) findViewById(R.id.loader);
+        mPbar = findViewById(R.id.loader);
 
-        webView = (AdvancedWebView) findViewById(R.id.newWeb);
+        webView = findViewById(R.id.newWeb);
         webView.loadUrl(url);
         webView.setListener(this, this);
 
