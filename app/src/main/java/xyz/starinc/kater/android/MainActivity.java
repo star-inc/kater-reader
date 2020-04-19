@@ -18,11 +18,8 @@ import android.widget.ProgressBar;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
-<<<<<<< HEAD
-=======
 
 import xyz.starinc.kater.android.R;
->>>>>>> ef58e07e4f44a40f8d260a7c6e011ab15af83973
 
 import im.delight.android.webview.AdvancedWebView;
 
