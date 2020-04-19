@@ -4,6 +4,10 @@
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
         <item name="android:windowDrawsSystemBarBackgrounds">true</item>
-        <item name="android:statusBarColor">@android:color/transparent</item>
+        <!--<item name="android:statusBarColor">@android:color/transparent</item>-->
+        <item name="android:statusBarColor">@color/blue</item>
+    </style>
+    <style name="AppTheme.WhiteAccent">
+        <item name="colorAccent">@color/blue</item> <!-- Whatever color you want-->
     </style>
 </resources>
