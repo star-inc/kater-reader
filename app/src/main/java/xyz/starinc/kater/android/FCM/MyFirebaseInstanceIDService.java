@@ -4,19 +4,18 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import android.util.Log;
-import com.google.firebase.iid.FirebaseInstanceId;
-import com.google.firebase.iid.FirebaseInstanceIdService;
 
-public class MyFirebaseInstanceIDService extends FirebaseInstanceIdService {
+import androidx.annotation.NonNull;
+
+import com.google.firebase.messaging.FirebaseMessagingService;
+
+public class MyFirebaseInstanceIDService extends FirebaseMessagingService {
 
     SharedPreferences preferences;
     private static final String TAG = "MyFirebaseIIDService";
 
     @Override
-    public void onTokenRefresh() {
-
-        //Getting registration token
-        String refreshedToken = FirebaseInstanceId.getInstance().getToken();
+    public void onNewToken(@NonNull String refreshedToken) {
 
         //Displaying token on logcat
         Log.d(TAG, "Refreshed token: " + refreshedToken);
@@ -34,8 +33,7 @@ public class MyFirebaseInstanceIDService extends FirebaseInstanceIdService {
 
         SharedPreferences.Editor editor = preferences.edit();
         editor.putString("fcm_token", token);
-        editor.commit();
-
+        editor.apply();
     }
 
 }
