@@ -10,6 +10,7 @@ import com.google.firebase.messaging.RemoteMessage;
 
 public class MyFirebaseInstanceService extends FirebaseMessagingService {
 
+
     SharedPreferences preferences;
     private static final String TAG = "MyFirebaseIIDService";
 
@@ -19,7 +20,7 @@ public class MyFirebaseInstanceService extends FirebaseMessagingService {
 
         //Getting registration token
         String refreshedToken = FirebaseInstanceId.getInstance().getToken();
-
+      
         //Displaying token on logcat
         Log.d(TAG, "Refreshed token: " + refreshedToken);
 
@@ -40,7 +41,6 @@ public class MyFirebaseInstanceService extends FirebaseMessagingService {
         SharedPreferences.Editor editor = preferences.edit();
         editor.putString("fcm_token", token);
         editor.apply();
-
     }
 
 }
