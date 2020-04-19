@@ -1,6 +1,9 @@
 package xyz.starinc.kater.android;
 
+import android.Manifest;
+import android.annotation.SuppressLint;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.os.Build;
 import android.os.Bundle;
@@ -16,34 +19,50 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.ProgressBar;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
-import xyz.starinc.kater.android.R;
+import java.util.List;
 
 import im.delight.android.webview.AdvancedWebView;
+import pub.devrel.easypermissions.AfterPermissionGranted;
+import pub.devrel.easypermissions.AppSettingsDialog;
+import pub.devrel.easypermissions.EasyPermissions;
 
-public class MainActivity extends AppCompatActivity implements AdvancedWebView.Listener{
+public class MainActivity extends AppCompatActivity implements AdvancedWebView.Listener, EasyPermissions.PermissionCallbacks{
 
     public AdvancedWebView webView;
     private ProgressBar mPbar = null;
-
+    SharedPreferences sharedPreferences;
+    SharedPreferences.Editor editor;
+    boolean isPermissionRequested = false;
     private static final String  url = "https://kater.me/";
-	String webURL, webTitle ;
+	String webURL;
+	String webTitle;
+    public static final int RC_PERMISSIONS = 123;
 
+    static final String[] PERMISSIONS = {
+            Manifest.permission.WRITE_EXTERNAL_STORAGE
+    };
 
+    @SuppressLint("SetJavaScriptEnabled")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        mPbar = (ProgressBar) findViewById(R.id.loader);
+        mPbar = findViewById(R.id.loader);
 
-        webView = (AdvancedWebView) findViewById(R.id.newWeb);
+        webView = findViewById(R.id.newWeb);
         webView.loadUrl(url);
         webView.setListener(this, this);
+
+        sharedPreferences = getSharedPreferences("GlobalPreferences", 0);
+
+        isPermissionRequested = sharedPreferences.getBoolean("IsPermissionRequested", false);
 
         WebSettings webSettings = webView.getSettings();
         webSettings.setJavaScriptEnabled(true);
@@ -96,6 +115,10 @@ public class MainActivity extends AppCompatActivity implements AdvancedWebView.L
 
         webView.setThirdPartyCookiesEnabled(true);
         webView.setCookiesEnabled(true);
+
+        if(!isPermissionRequested){
+            requestPermissions();
+        }
     }
 
     @Override
@@ -184,5 +207,37 @@ public class MainActivity extends AppCompatActivity implements AdvancedWebView.L
     @Override
     public void onExternalPageRequest(String url) {
 
+    }
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+
+        // Forward results to EasyPermissions
+        EasyPermissions.onRequestPermissionsResult(requestCode, permissions, grantResults, this);
+    }
+
+    @Override
+    public void onPermissionsGranted(int requestCode, @NonNull List<String> list) {
+        // Some permissions have been granted
+        // ...
+    }
+
+    @Override
+    public void onPermissionsDenied(int requestCode, @NonNull List<String> perms) {
+        // Some permissions have been denied
+        // ...
+        if (EasyPermissions.somePermissionPermanentlyDenied(this, perms)) {
+            new AppSettingsDialog.Builder(this).build().show();
+        }
+    }
+    @AfterPermissionGranted(RC_PERMISSIONS)
+    private void requestPermissions() {
+        if(!EasyPermissions.hasPermissions(this, PERMISSIONS)) {
+            // Do not have permissions, request them now
+            EasyPermissions.requestPermissions(this, "This permission is needed to upload images.",
+                    RC_PERMISSIONS, PERMISSIONS);
+            editor = sharedPreferences.edit();
+            editor.putBoolean("IsPermissionRequested", true).apply();
+        }
     }
 }

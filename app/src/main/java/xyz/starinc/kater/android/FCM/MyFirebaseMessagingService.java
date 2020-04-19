@@ -28,7 +28,9 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
         //Displaying data in log
         //It is optional
         Log.d(TAG, "From: " + remoteMessage.getFrom());
-        Log.d(TAG, "Notification Message Body: " + remoteMessage.getNotification().getBody());
+        if(remoteMessage.getNotification() != null){
+            Log.d(TAG, "Notification Message Body: " + remoteMessage.getNotification().getBody());
+        }
         Log.d(TAG, "Notification Message Link: " + remoteMessage.getData().get("link"));
 
         //Calling method to generate notification
@@ -45,7 +47,7 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
         intent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_CLEAR_TOP);
         PendingIntent pendingIntent = PendingIntent.getActivity(getApplicationContext(), 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
 
-        NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this)
+        NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this, "1234")
                 .setLargeIcon(BitmapFactory.decodeResource(getBaseContext().getResources(), R.mipmap.ic_launcher))
                 .setSmallIcon(R.mipmap.ic_launcher)
                 .setContentTitle(messageTitle)
@@ -69,8 +71,9 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
         if (preferences.getBoolean("notifications_new_message", true)) {
 
             notificationBuilder.setContentIntent(pendingIntent);
-            notificationManager.notify(1, notificationBuilder.build());
+            if(notificationManager != null){
+                notificationManager.notify(1, notificationBuilder.build());
+            }
         }
-
     }
 }
