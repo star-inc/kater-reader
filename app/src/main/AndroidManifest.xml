@@ -4,6 +4,7 @@
     package="xyz.starinc.kater.android">
 
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
     <uses-permission android:name="android.permission.INTERNET" />
 
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
@@ -26,7 +27,7 @@
             </intent-filter>
         </activity>
         <service
-            android:name=".FCM.MyFirebaseInstanceService"
+            android:name="$FCM.MyFirebaseInstanceService"
             android:stopWithTask="false"
             android:permission="TODO"
             tools:ignore="ExportedService">
@@ -35,7 +36,7 @@
             </intent-filter>
         </service>
         <service
-            android:name=".FCM.MyFirebaseMessagingService"
+            android:name="$FCM.MyFirebaseMessagingService"
             android:stopWithTask="false"
             android:permission="TODO"
             tools:ignore="ExportedService">

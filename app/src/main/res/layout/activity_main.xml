@@ -14,13 +14,19 @@
         android:background="?attr/colorPrimary"
         app:popupTheme="@style/AppTheme.NoActionBar" />
 
-    <im.delight.android.webview.AdvancedWebView
-        android:id="@+id/newWeb"
+    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+        android:id="@+id/swipeContainer"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
-    </im.delight.android.webview.AdvancedWebView>
+        <im.delight.android.webview.AdvancedWebView
+            android:id="@+id/newWeb"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:layout_behavior="@string/appbar_scrolling_view_behavior"/>
+
+    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
     <ProgressBar
         style="?android:attr/progressBarStyleLarge"

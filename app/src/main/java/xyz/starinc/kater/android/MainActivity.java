@@ -2,26 +2,40 @@ package xyz.starinc.kater.android;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.app.AlertDialog;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
+import android.net.ConnectivityManager;
+import android.net.NetworkCapabilities;
+import android.net.NetworkInfo;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Message;
+import android.util.Log;
 import android.view.KeyEvent;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.webkit.CookieManager;
 import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.ProgressBar;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.app.ActivityCompat;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import java.util.List;
 import im.delight.android.webview.AdvancedWebView;
@@ -31,8 +45,12 @@ import pub.devrel.easypermissions.EasyPermissions;
 
 public class MainActivity extends AppCompatActivity implements AdvancedWebView.Listener, EasyPermissions.PermissionCallbacks{
 
+    private NetworkStatDetector networkStatDetector;
+    private IntentFilter intentFilter;
     public AdvancedWebView webView;
-    private ProgressBar mPbar = null;
+    private ProgressBar mPbar;
+    WebSettings webSettings;
+    private SwipeRefreshLayout swipeRefreshLayout;
     SharedPreferences sharedPreferences;
     SharedPreferences.Editor editor;
     boolean isPermissionRequested = false;
@@ -53,7 +71,12 @@ public class MainActivity extends AppCompatActivity implements AdvancedWebView.L
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        networkStatDetector = new NetworkStatDetector();
+        intentFilter = new IntentFilter();
+        intentFilter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
+
         mPbar = findViewById(R.id.loader);
+        swipeRefreshLayout = findViewById(R.id.swipeContainer);
 
         webView = findViewById(R.id.newWeb);
         webView.loadUrl(url);
@@ -63,11 +86,15 @@ public class MainActivity extends AppCompatActivity implements AdvancedWebView.L
 
         isPermissionRequested = sharedPreferences.getBoolean("IsPermissionRequested", false);
 
-        WebSettings webSettings = webView.getSettings();
+        webSettings = webView.getSettings();
         webSettings.setJavaScriptEnabled(true);
         webSettings.setAppCacheEnabled(true);
         webSettings.setDomStorageEnabled(true);
-        webSettings.setCacheMode(WebSettings.LOAD_DEFAULT);
+        if(isNetworkAvailable(this)){
+            webSettings.setCacheMode(WebSettings.LOAD_DEFAULT);
+        }else{
+            webSettings.setCacheMode(WebSettings.LOAD_CACHE_ELSE_NETWORK);
+        }
         webSettings.setAllowFileAccess(true);
 
         CookieManager cookieManager = CookieManager.getInstance();
@@ -115,6 +142,17 @@ public class MainActivity extends AppCompatActivity implements AdvancedWebView.L
         webView.setThirdPartyCookiesEnabled(true);
         webView.setCookiesEnabled(true);
 
+        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                if(isNetworkAvailable(MainActivity.this)){
+                    webView.reload();
+                }else{
+                    Toast.makeText(MainActivity.this, "Network not available", Toast.LENGTH_SHORT).show();
+                }
+                swipeRefreshLayout.setRefreshing(false);
+            }
+        });
         if(!isPermissionRequested){
             requestPermissions();
         }
@@ -154,12 +192,14 @@ public class MainActivity extends AppCompatActivity implements AdvancedWebView.L
     protected void onResume() {
         super.onResume();
         webView.onResume();
+        this.registerReceiver(networkStatDetector, intentFilter);
     }
 
     @Override
     protected void onPause() {
         webView.onPause();
         super.onPause();
+        this.unregisterReceiver(networkStatDetector);
     }
 
     @Override
@@ -176,21 +216,20 @@ public class MainActivity extends AppCompatActivity implements AdvancedWebView.L
 
     @Override
     public void onBackPressed() {
-        if (!webView.onBackPressed()) { return; }
-        super.onBackPressed();
+        if (!webView.canGoBack()) {
+            showExitDialog();
+        }
     }
 
 
     @Override
     public void onPageStarted(String url, Bitmap favicon) {
-
     }
 
     @Override
     public void onPageFinished(String url) {
 		webURL = webView.getUrl();
         webTitle = webView.getTitle();
-
     }
 
     @Override
@@ -238,5 +277,68 @@ public class MainActivity extends AppCompatActivity implements AdvancedWebView.L
             editor = sharedPreferences.edit();
             editor.putBoolean("IsPermissionRequested", true).apply();
         }
+    }
+    public static boolean isNetworkAvailable(Context context) {
+        if(context == null){
+            return false;
+        }
+        ConnectivityManager connectivityManager = (ConnectivityManager)context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        if (connectivityManager != null) {
+            if (android.os.Build.VERSION.SDK_INT >= 29) {
+                NetworkCapabilities capabilities = connectivityManager.getNetworkCapabilities(connectivityManager.getActiveNetwork());
+                if (capabilities != null) {
+                    if (capabilities.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR)) {
+                        return true;
+                    } else if (capabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI)) {
+                        return true;
+                    }  else if (capabilities.hasTransport(NetworkCapabilities.TRANSPORT_ETHERNET)){
+                        return true;
+                    }
+                }
+            }else{
+                try{
+                    NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
+                    if(activeNetworkInfo != null && activeNetworkInfo.isConnected()) {
+                        Log.i("update_status", "Network is available : true");
+                        return true;
+                    }
+                }catch(Exception e) {
+                    Log.i("update_status", "" + e.getMessage());
+                }
+            }
+        }
+        Log.i("update_status","Network is available : FALSE ");
+        return false;
+    }
+    private class NetworkStatDetector extends BroadcastReceiver{
+        @Override
+        public void onReceive(Context context, Intent intent){
+            if(isNetworkAvailable(context)){
+                webSettings.setCacheMode(WebSettings.LOAD_DEFAULT);
+            }else{
+                webSettings.setCacheMode(WebSettings.LOAD_CACHE_ELSE_NETWORK);
+            }
+        }
+    }
+    public void showExitDialog(){
+        final ViewGroup nullParent = null;
+        AlertDialog.Builder alertDialog = new AlertDialog.Builder(MainActivity.this);
+        LayoutInflater layoutInflater = LayoutInflater.from(MainActivity.this);
+        View view = layoutInflater.inflate(R.layout.exit_notify, nullParent);
+
+        alertDialog.setView(view);
+        alertDialog.setCancelable(false);
+        alertDialog.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int which) {
+                ActivityCompat.finishAffinity(MainActivity.this);
+                dialog.dismiss();
+            }
+        });
+        alertDialog.setNegativeButton("No", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+            }
+        });
+        alertDialog.show();
     }
 }
