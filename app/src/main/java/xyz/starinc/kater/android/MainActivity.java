@@ -90,6 +90,9 @@ public class MainActivity extends AppCompatActivity implements AdvancedWebView.L
         webSettings.setJavaScriptEnabled(true);
         webSettings.setAppCacheEnabled(true);
         webSettings.setDomStorageEnabled(true);
+        String default_ua = webSettings.getUserAgentString();
+        String kater_ua = String.format("%s; %s", default_ua, R.string.sau_code);
+        webSettings.setUserAgentString(kater_ua);
         if(isNetworkAvailable(this)){
             webSettings.setCacheMode(WebSettings.LOAD_DEFAULT);
         }else{
