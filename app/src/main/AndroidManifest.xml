@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    package="xyz.starinc.kater.android">
+    package="xyz.starinc.kater.reader">
 
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
@@ -16,10 +16,8 @@
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <meta-data android:name="com.facebook.sdk.ApplicationId"
-            android:value="@string/facebook_app_id"/>
         <activity
-            android:name="xyz.starinc.kater.android.MainActivity"
+            android:name="xyz.starinc.kater.reader.MainActivity"
             android:label="@string/app_name"
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
@@ -28,18 +26,8 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity
-            android:name="com.facebook.CustomTabActivity"
-            android:exported="true">
-            <intent-filter>
-                <action android:name="android.intent.action.VIEW" />
-                <category android:name="android.intent.category.DEFAULT" />
-                <category android:name="android.intent.category.BROWSABLE" />
-                <data android:scheme="@string/fb_login_protocol_scheme" />
-            </intent-filter>
-        </activity>
         <service
-            android:name=".fcm.MyFirebaseInstanceService"
+            android:name="xyz.starinc.kater.reader.fcm.MyFirebaseInstanceService"
             android:stopWithTask="false"
             android:permission="TODO"
             tools:ignore="ExportedService">
@@ -48,7 +36,7 @@
             </intent-filter>
         </service>
         <service
-            android:name=".fcm.MyFirebaseMessagingService"
+            android:name="xyz.starinc.kater.reader.fcm.MyFirebaseMessagingService"
             android:stopWithTask="false"
             android:permission="TODO"
             tools:ignore="ExportedService">
@@ -56,10 +44,6 @@
                 <action android:name="com.google.firebase.MESSAGING_EVENT" />
             </intent-filter>
         </service>
-        <activity android:name="com.facebook.FacebookActivity"
-            android:configChanges=
-                "keyboard|keyboardHidden|screenLayout|screenSize|orientation"
-            android:label="@string/app_name" />
     </application>
 
 </manifest>

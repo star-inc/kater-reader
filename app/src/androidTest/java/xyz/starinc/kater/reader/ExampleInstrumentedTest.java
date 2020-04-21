@@ -1,4 +1,4 @@
-package xyz.starinc.kater.android;
+package xyz.starinc.kater.reader;
 
 import android.content.Context;
 import androidx.test.platform.app.InstrumentationRegistry;

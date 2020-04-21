@@ -1,8 +1,9 @@
-package xyz.starinc.kater.android;
+package xyz.starinc.kater.reader;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
+import android.app.DownloadManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -18,6 +19,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Message;
 import android.util.Log;
+import android.view.ContextMenu;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -25,6 +27,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.CookieManager;
+import android.webkit.URLUtil;
 import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
@@ -40,14 +43,6 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
-import com.facebook.AccessToken;
-import com.facebook.CallbackManager;
-import com.facebook.FacebookCallback;
-import com.facebook.FacebookException;
-import com.facebook.login.LoginManager;
-import com.facebook.login.LoginResult;
-
-import java.util.Arrays;
 import java.util.List;
 import im.delight.android.webview.AdvancedWebView;
 import pub.devrel.easypermissions.AfterPermissionGranted;
@@ -56,7 +51,6 @@ import pub.devrel.easypermissions.EasyPermissions;
 
 public class MainActivity extends AppCompatActivity implements AdvancedWebView.Listener, EasyPermissions.PermissionCallbacks{
 
-    private CallbackManager callbackManager;
     private NetworkStatDetector networkStatDetector;
     private IntentFilter intentFilter;
     public AdvancedWebView webView;
@@ -76,7 +70,6 @@ public class MainActivity extends AppCompatActivity implements AdvancedWebView.L
     static final String[] PERMISSIONS = {
             Manifest.permission.WRITE_EXTERNAL_STORAGE
     };
-    static final List<String> permissionNeeds = Arrays.asList("email");
 
     @SuppressLint("SetJavaScriptEnabled")
     @Override
@@ -87,27 +80,6 @@ public class MainActivity extends AppCompatActivity implements AdvancedWebView.L
         setSupportActionBar(toolbar);
 
         viewFlipperStats = 0;
-
-        callbackManager = CallbackManager.Factory.create();
-
-        //get access token, expired every 90days AccessToken accessToken = AccessToken.getCurrentAccessToken();
-        //check if token is valid boolean isLoggedIn = accessToken != null && !accessToken.isExpired();
-
-        LoginManager.getInstance().registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
-            @Override
-            public void onSuccess(LoginResult loginResult) {
-                webView.loadUrl(url);
-                Log.d("Success", "Login");
-            }
-            @Override
-            public void onCancel() {
-                Toast.makeText(MainActivity.this, "Login Cancel", Toast.LENGTH_LONG).show();
-            }
-            @Override
-            public void onError(FacebookException exception) {
-                Toast.makeText(MainActivity.this, exception.getMessage(), Toast.LENGTH_LONG).show();
-            }
-        });
 
         networkStatDetector = new NetworkStatDetector();
         intentFilter = new IntentFilter();
@@ -149,6 +121,11 @@ public class MainActivity extends AppCompatActivity implements AdvancedWebView.L
                 resultMsg.sendToTarget();
                 return true;
             }
+
+            @Override
+            public void onCloseWindow(WebView window) {
+                Log.d("onCloseWindow", "called");
+            }
         });
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
@@ -166,12 +143,18 @@ public class MainActivity extends AppCompatActivity implements AdvancedWebView.L
             @Override
             public void onPageFinished(WebView view, String url) {
                 mPbar.setVisibility(View.GONE);
+                if(url.startsWith("https://kater.me/auth/facebook?code=")){
+                    view.loadUrl("https://kater.me");
+                    currentUrl = webView.getUrl();
+                }
+                super.onPageFinished(view, url);
             }
             @Override
             public boolean shouldOverrideUrlLoading(WebView view, String url) {
-                if (url.contains("kater.me/auth/facebook")) {
-                    LoginManager.getInstance().logInWithReadPermissions(MainActivity.this, permissionNeeds);
-                }else if ((url.startsWith("http://") || url.startsWith("https://")) && url.contains(".")) {
+                if(url.contains("auth") && url.contains("facebook")){
+                    view.loadUrl(url);
+                    currentUrl = webView.getUrl();
+                }else if((url.startsWith("http://") || url.startsWith("https://")) && url.contains(".")){
                     Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
                     if (Build.VERSION.SDK_INT >= 21) {
                         intent.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY | Intent.FLAG_ACTIVITY_NEW_DOCUMENT | Intent.FLAG_ACTIVITY_MULTIPLE_TASK);
@@ -179,7 +162,7 @@ public class MainActivity extends AppCompatActivity implements AdvancedWebView.L
                         intent.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY | Intent.FLAG_ACTIVITY_MULTIPLE_TASK);
                     }
                     startActivity(intent);
-                } else {
+                }else{
                     view.loadUrl(url);
                     currentUrl = webView.getUrl();
                 }
@@ -226,9 +209,45 @@ public class MainActivity extends AppCompatActivity implements AdvancedWebView.L
             requestPermissions();
         }
         webView.loadUrl(url);
+        registerForContextMenu(webView);
         currentUrl = url;
     }
+    @Override
+    public void onCreateContextMenu(ContextMenu contextMenu, View view, ContextMenu.ContextMenuInfo contextMenuInfo){
+        super.onCreateContextMenu(contextMenu, view, contextMenuInfo);
 
+        final WebView.HitTestResult webViewHitTestResult = webView.getHitTestResult();
+
+        if (webViewHitTestResult.getType() == WebView.HitTestResult.IMAGE_TYPE ||
+                webViewHitTestResult.getType() == WebView.HitTestResult.SRC_IMAGE_ANCHOR_TYPE) {
+
+            contextMenu.setHeaderTitle("Download Image...");
+            contextMenu.setHeaderIcon(R.drawable.ic_download);
+
+            contextMenu.add(0, 1, 0, "Click to download").setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+                @Override
+                public boolean onMenuItemClick(MenuItem menuItem) {
+
+                    String DownloadImageURL = webViewHitTestResult.getExtra();
+
+                    if(URLUtil.isValidUrl(DownloadImageURL)){
+                        DownloadManager.Request mRequest = new DownloadManager.Request(Uri.parse(DownloadImageURL));
+                        mRequest.allowScanningByMediaScanner();
+                        mRequest.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
+                        DownloadManager mDownloadManager = (DownloadManager) getSystemService(DOWNLOAD_SERVICE);
+                        if(mDownloadManager != null){
+                            mDownloadManager.enqueue(mRequest);
+                        }
+                        Toast.makeText(MainActivity.this,"Image Downloaded Successfully...",Toast.LENGTH_LONG).show();
+                    }
+                    else {
+                        Toast.makeText(MainActivity.this,"Error downloading file...",Toast.LENGTH_LONG).show();
+                    }
+                    return false;
+                }
+            });
+        }
+    }
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
@@ -283,7 +302,6 @@ public class MainActivity extends AppCompatActivity implements AdvancedWebView.L
     protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
         super.onActivityResult(requestCode, resultCode, intent);
         webView.onActivityResult(requestCode, resultCode, intent);
-        callbackManager.onActivityResult(requestCode, resultCode, intent);
     }
 
     @Override

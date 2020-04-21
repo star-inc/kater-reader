@@ -1,4 +1,4 @@
-package xyz.starinc.kater.android;
+package xyz.starinc.kater.reader;
 
 import org.junit.Test;
 
