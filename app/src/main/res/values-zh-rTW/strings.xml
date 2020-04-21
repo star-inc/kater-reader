@@ -2,5 +2,19 @@
     <string name="app_name">Kater 卡特</string>
 	<string name="action_share">分享</string>
     <string name="action_settings">設定</string>
-    <string name="do_you_want_to_quit_the_application">是否退出卡特？</string>
+    <string name="quit_application_prompt">是否退出卡特？</string>
+    <!--To be translated-->
+    <string name="first_notify">Translate yourself, please also translate MainActivity.java and activity_main.xml</string>
+    <string name="i_understand">I understand</string>
+    <string name="close">Close</string>
+    <string name="connection_error">Connection error, please try again.</string>
+    <string name="reload">Reload</string>
+    <string name="network_not_available">Network not available.</string>
+    <string name="download_image">Download Image</string>
+    <string name="click_to_download">Click to Download</string>
+    <string name="download_success">Image Downloaded Successfully</string>
+    <string name="download_failed">Image Downloaded Failed</string>
+    <string name="perm_needed">This permission is needed to upload images.</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
 </resources>

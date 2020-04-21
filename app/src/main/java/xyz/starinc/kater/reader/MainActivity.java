@@ -33,6 +33,8 @@ import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 import android.widget.ViewFlipper;
@@ -60,6 +62,7 @@ public class MainActivity extends AppCompatActivity implements AdvancedWebView.L
     private SwipeRefreshLayout swipeRefreshLayout;
     private SharedPreferences sharedPreferences;
     boolean isPermissionRequested = false;
+    boolean isFirstRun = false;
     private static final String  url = "https://kater.me/";
     private String webURL;
     private String webTitle;
@@ -96,6 +99,7 @@ public class MainActivity extends AppCompatActivity implements AdvancedWebView.L
         sharedPreferences = getSharedPreferences("GlobalPreferences", 0);
 
         isPermissionRequested = sharedPreferences.getBoolean("IsPermissionRequested", false);
+        isFirstRun = sharedPreferences.getBoolean("IsFirstRun", false);
 
         webSettings = webView.getSettings();
         webSettings.setJavaScriptEnabled(true);
@@ -191,7 +195,7 @@ public class MainActivity extends AppCompatActivity implements AdvancedWebView.L
                     webView.reload();
                     currentUrl = webView.getUrl();
                 }else{
-                    Toast.makeText(MainActivity.this, "Network not available", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(MainActivity.this, R.string.network_not_available, Toast.LENGTH_SHORT).show();
                 }
                 swipeRefreshLayout.setRefreshing(false);
             }
@@ -211,6 +215,9 @@ public class MainActivity extends AppCompatActivity implements AdvancedWebView.L
         webView.loadUrl(url);
         registerForContextMenu(webView);
         currentUrl = url;
+        if(!isFirstRun){
+            showFirstDialog();
+        }
     }
     @Override
     public void onCreateContextMenu(ContextMenu contextMenu, View view, ContextMenu.ContextMenuInfo contextMenuInfo){
@@ -221,10 +228,10 @@ public class MainActivity extends AppCompatActivity implements AdvancedWebView.L
         if (webViewHitTestResult.getType() == WebView.HitTestResult.IMAGE_TYPE ||
                 webViewHitTestResult.getType() == WebView.HitTestResult.SRC_IMAGE_ANCHOR_TYPE) {
 
-            contextMenu.setHeaderTitle("Download Image...");
+            contextMenu.setHeaderTitle(R.string.download_image);
             contextMenu.setHeaderIcon(R.drawable.ic_download);
 
-            contextMenu.add(0, 1, 0, "Click to download").setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+            contextMenu.add(0, 1, 0, R.string.click_to_download).setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
                 @Override
                 public boolean onMenuItemClick(MenuItem menuItem) {
 
@@ -238,10 +245,10 @@ public class MainActivity extends AppCompatActivity implements AdvancedWebView.L
                         if(mDownloadManager != null){
                             mDownloadManager.enqueue(mRequest);
                         }
-                        Toast.makeText(MainActivity.this,"Image Downloaded Successfully...",Toast.LENGTH_LONG).show();
+                        Toast.makeText(MainActivity.this,R.string.download_success,Toast.LENGTH_SHORT).show();
                     }
                     else {
-                        Toast.makeText(MainActivity.this,"Error downloading file...",Toast.LENGTH_LONG).show();
+                        Toast.makeText(MainActivity.this,R.string.download_failed,Toast.LENGTH_SHORT).show();
                     }
                     return false;
                 }
@@ -267,7 +274,7 @@ public class MainActivity extends AppCompatActivity implements AdvancedWebView.L
             Intent sharingIntent = new Intent(Intent.ACTION_SEND);
             sharingIntent.setType("text/plain");
             String shareBody = webTitle+":\n"+webURL;
-            sharingIntent.putExtra(android.content.Intent.EXTRA_SUBJECT, "Flarum Community");
+            sharingIntent.putExtra(android.content.Intent.EXTRA_SUBJECT, "Kater");
             sharingIntent.putExtra(android.content.Intent.EXTRA_TEXT, shareBody);
             startActivity(Intent.createChooser(sharingIntent, "Share using"));
         } else if (id == R.id.action_settings) {
@@ -366,7 +373,7 @@ public class MainActivity extends AppCompatActivity implements AdvancedWebView.L
     private void requestPermissions() {
         if(!EasyPermissions.hasPermissions(this, PERMISSIONS)) {
             // Do not have permissions, request them now
-            EasyPermissions.requestPermissions(this, "This permission is needed to upload images.",
+            EasyPermissions.requestPermissions(this, getString(R.string.perm_needed),
                     RC_PERMISSIONS, PERMISSIONS);
             SharedPreferences.Editor editor = sharedPreferences.edit();
             editor.putBoolean("IsPermissionRequested", true).apply();
@@ -423,17 +430,52 @@ public class MainActivity extends AppCompatActivity implements AdvancedWebView.L
 
         alertDialog.setView(view);
         alertDialog.setCancelable(false);
-        alertDialog.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+        alertDialog.setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int which) {
                 ActivityCompat.finishAffinity(MainActivity.this);
                 dialog.dismiss();
             }
         });
-        alertDialog.setNegativeButton("No", new DialogInterface.OnClickListener() {
+        alertDialog.setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int which) {
                 dialog.dismiss();
             }
         });
         alertDialog.show();
+    }
+    protected void showFirstDialog(){
+
+        final ViewGroup nullParent = null;
+
+        final AlertDialog.Builder builder = new AlertDialog.Builder(this);
+
+        LayoutInflater layoutInflater = LayoutInflater.from(this);
+        View view = layoutInflater.inflate(R.layout.first_notify, nullParent);
+        CheckBox checkBox = view.findViewById(R.id.checkBox);
+        builder.setView(view);
+        builder.setCancelable(false);
+        builder.setPositiveButton(R.string.close, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int which){
+                SharedPreferences.Editor editor = sharedPreferences.edit();
+                editor.putBoolean("IsFirstRun", true);
+                editor.apply();
+                isFirstRun = sharedPreferences.getBoolean("IsFirstRun", false);
+                dialog.dismiss();
+            }
+        });
+        final AlertDialog dialog = builder.create();
+        dialog.show();
+
+        dialog.getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(false);
+        checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if(isChecked){
+                    dialog.getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(true);
+                }else{
+                    dialog.getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(false);
+                }
+            }
+        });
     }
 }

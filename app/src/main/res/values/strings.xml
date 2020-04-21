@@ -2,4 +2,18 @@
     <string name="app_name">Kater 卡特 Reader</string>
 	<string name="action_share">Share</string>
     <string name="action_settings">Settings</string>
+    <string name="quit_application_prompt">Do you want to quit application?</string>
+    <string name="first_notify">Gesture(Might add more in future):\n\n1. Pull down to refresh\n2.Long click image to download.</string>
+    <string name="i_understand">I understand</string>
+    <string name="close">Close</string>
+    <string name="connection_error">Connection error, please try again.</string>
+    <string name="reload">Reload</string>
+    <string name="network_not_available">Network not available.</string>
+    <string name="download_image">Download Image</string>
+    <string name="click_to_download">Click to Download</string>
+    <string name="download_success">Image Downloaded Successfully</string>
+    <string name="download_failed">Image Downloaded Failed</string>
+    <string name="perm_needed">This permission is needed to upload images.</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
 </resources>
