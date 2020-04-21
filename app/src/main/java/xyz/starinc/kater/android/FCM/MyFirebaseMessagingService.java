@@ -1,4 +1,4 @@
-package xyz.starinc.kater.android.FCM;
+package xyz.starinc.kater.android.fcm;
 
 import android.app.NotificationManager;
 import android.app.PendingIntent;

@@ -1,4 +1,4 @@
-package xyz.starinc.kater.android.FCM;
+package xyz.starinc.kater.android.fcm;
 
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;

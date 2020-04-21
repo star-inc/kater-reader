@@ -1,7 +1,7 @@
 <resources>
-    <string name="app_name">Kater</string>
-    <string name="sau_code" translatable="false">Kater_1.0</string>
+    <string name="app_name">Kater 卡特 Reader</string>
 	<string name="action_share">Share</string>
     <string name="action_settings">Settings</string>
-    <string name="do_you_want_to_quit_the_application">Do you want to quit the application?</string>
+    <string name="facebook_app_id">572696270025537</string>
+    <string name="fb_login_protocol_scheme">fb572696270025537</string>
 </resources>

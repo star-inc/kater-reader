@@ -13,6 +13,7 @@ import android.graphics.Bitmap;
 import android.net.ConnectivityManager;
 import android.net.NetworkCapabilities;
 import android.net.NetworkInfo;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Message;
@@ -28,8 +29,10 @@ import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.Toast;
+import android.widget.ViewFlipper;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -37,6 +40,14 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
+import com.facebook.AccessToken;
+import com.facebook.CallbackManager;
+import com.facebook.FacebookCallback;
+import com.facebook.FacebookException;
+import com.facebook.login.LoginManager;
+import com.facebook.login.LoginResult;
+
+import java.util.Arrays;
 import java.util.List;
 import im.delight.android.webview.AdvancedWebView;
 import pub.devrel.easypermissions.AfterPermissionGranted;
@@ -45,23 +56,27 @@ import pub.devrel.easypermissions.EasyPermissions;
 
 public class MainActivity extends AppCompatActivity implements AdvancedWebView.Listener, EasyPermissions.PermissionCallbacks{
 
+    private CallbackManager callbackManager;
     private NetworkStatDetector networkStatDetector;
     private IntentFilter intentFilter;
     public AdvancedWebView webView;
+    private ViewFlipper viewFlipper;
     private ProgressBar mPbar;
-    WebSettings webSettings;
+    private WebSettings webSettings;
     private SwipeRefreshLayout swipeRefreshLayout;
-    SharedPreferences sharedPreferences;
-    SharedPreferences.Editor editor;
+    private SharedPreferences sharedPreferences;
     boolean isPermissionRequested = false;
     private static final String  url = "https://kater.me/";
-	String webURL;
-	String webTitle;
+    private String webURL;
+    private String webTitle;
+    private String currentUrl;
+    private int viewFlipperStats = 0;
     public static final int RC_PERMISSIONS = 123;
 
     static final String[] PERMISSIONS = {
             Manifest.permission.WRITE_EXTERNAL_STORAGE
     };
+    static final List<String> permissionNeeds = Arrays.asList("email");
 
     @SuppressLint("SetJavaScriptEnabled")
     @Override
@@ -71,15 +86,39 @@ public class MainActivity extends AppCompatActivity implements AdvancedWebView.L
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        viewFlipperStats = 0;
+
+        callbackManager = CallbackManager.Factory.create();
+
+        //get access token, expired every 90days AccessToken accessToken = AccessToken.getCurrentAccessToken();
+        //check if token is valid boolean isLoggedIn = accessToken != null && !accessToken.isExpired();
+
+        LoginManager.getInstance().registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
+            @Override
+            public void onSuccess(LoginResult loginResult) {
+                webView.loadUrl(url);
+                Log.d("Success", "Login");
+            }
+            @Override
+            public void onCancel() {
+                Toast.makeText(MainActivity.this, "Login Cancel", Toast.LENGTH_LONG).show();
+            }
+            @Override
+            public void onError(FacebookException exception) {
+                Toast.makeText(MainActivity.this, exception.getMessage(), Toast.LENGTH_LONG).show();
+            }
+        });
+
         networkStatDetector = new NetworkStatDetector();
         intentFilter = new IntentFilter();
         intentFilter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
 
         mPbar = findViewById(R.id.loader);
         swipeRefreshLayout = findViewById(R.id.swipeContainer);
+        viewFlipper = findViewById(R.id.viewFlipper);
+        Button button = findViewById(R.id.button);
 
         webView = findViewById(R.id.newWeb);
-        webView.loadUrl(url);
         webView.setListener(this, this);
 
         sharedPreferences = getSharedPreferences("GlobalPreferences", 0);
@@ -90,19 +129,17 @@ public class MainActivity extends AppCompatActivity implements AdvancedWebView.L
         webSettings.setJavaScriptEnabled(true);
         webSettings.setAppCacheEnabled(true);
         webSettings.setDomStorageEnabled(true);
-        String default_ua = webSettings.getUserAgentString();
-        String kater_ua = String.format("%s; %s", default_ua, R.string.sau_code);
-        webSettings.setUserAgentString(kater_ua);
+
+        CookieManager cookieManager = CookieManager.getInstance();
+        cookieManager.setAcceptCookie(true);
+
         if(isNetworkAvailable(this)){
             webSettings.setCacheMode(WebSettings.LOAD_DEFAULT);
         }else{
             webSettings.setCacheMode(WebSettings.LOAD_CACHE_ELSE_NETWORK);
         }
+
         webSettings.setAllowFileAccess(true);
-
-        CookieManager cookieManager = CookieManager.getInstance();
-        cookieManager.setAcceptCookie(true);
-
         webView.setWebChromeClient(new WebChromeClient() {
             @Override
             public boolean onCreateWindow(WebView view, boolean isDialog, boolean isUserGesture, Message resultMsg) {
@@ -126,8 +163,27 @@ public class MainActivity extends AppCompatActivity implements AdvancedWebView.L
             public void onPageStarted(WebView view, String url, Bitmap favicon) {
                 mPbar.setVisibility(View.VISIBLE);
             }
+            @Override
             public void onPageFinished(WebView view, String url) {
                 mPbar.setVisibility(View.GONE);
+            }
+            @Override
+            public boolean shouldOverrideUrlLoading(WebView view, String url) {
+                if (url.contains("kater.me/auth/facebook")) {
+                    LoginManager.getInstance().logInWithReadPermissions(MainActivity.this, permissionNeeds);
+                }else if ((url.startsWith("http://") || url.startsWith("https://")) && url.contains(".")) {
+                    Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+                    if (Build.VERSION.SDK_INT >= 21) {
+                        intent.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY | Intent.FLAG_ACTIVITY_NEW_DOCUMENT | Intent.FLAG_ACTIVITY_MULTIPLE_TASK);
+                    } else {
+                        intent.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY | Intent.FLAG_ACTIVITY_MULTIPLE_TASK);
+                    }
+                    startActivity(intent);
+                } else {
+                    view.loadUrl(url);
+                    currentUrl = webView.getUrl();
+                }
+                return true;
             }
         });
 
@@ -150,15 +206,27 @@ public class MainActivity extends AppCompatActivity implements AdvancedWebView.L
             public void onRefresh() {
                 if(isNetworkAvailable(MainActivity.this)){
                     webView.reload();
+                    currentUrl = webView.getUrl();
                 }else{
                     Toast.makeText(MainActivity.this, "Network not available", Toast.LENGTH_SHORT).show();
                 }
                 swipeRefreshLayout.setRefreshing(false);
             }
         });
+        button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                webView.loadUrl(currentUrl);
+                currentUrl = webView.getUrl();
+                viewFlipperStats = 0;
+                viewFlipper.showNext();
+            }
+        });
         if(!isPermissionRequested){
             requestPermissions();
         }
+        webView.loadUrl(url);
+        currentUrl = url;
     }
 
     @Override
@@ -200,8 +268,8 @@ public class MainActivity extends AppCompatActivity implements AdvancedWebView.L
 
     @Override
     protected void onPause() {
-        webView.onPause();
         super.onPause();
+        webView.onPause();
         this.unregisterReceiver(networkStatDetector);
     }
 
@@ -215,6 +283,7 @@ public class MainActivity extends AppCompatActivity implements AdvancedWebView.L
     protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
         super.onActivityResult(requestCode, resultCode, intent);
         webView.onActivityResult(requestCode, resultCode, intent);
+        callbackManager.onActivityResult(requestCode, resultCode, intent);
     }
 
     @Override
@@ -237,7 +306,11 @@ public class MainActivity extends AppCompatActivity implements AdvancedWebView.L
 
     @Override
     public void onPageError(int errorCode, String description, String failingUrl) {
-
+        webView.loadUrl("about:blank");
+        if(viewFlipperStats == 0){
+            viewFlipperStats = 1;
+            viewFlipper.showNext();
+        }
     }
 
     @Override
@@ -277,8 +350,9 @@ public class MainActivity extends AppCompatActivity implements AdvancedWebView.L
             // Do not have permissions, request them now
             EasyPermissions.requestPermissions(this, "This permission is needed to upload images.",
                     RC_PERMISSIONS, PERMISSIONS);
-            editor = sharedPreferences.edit();
+            SharedPreferences.Editor editor = sharedPreferences.edit();
             editor.putBoolean("IsPermissionRequested", true).apply();
+            isPermissionRequested = sharedPreferences.getBoolean("IsPermissionRequested", false);
         }
     }
     public static boolean isNetworkAvailable(Context context) {
