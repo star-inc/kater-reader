@@ -17,7 +17,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
-            android:name="xyz.starinc.exa.xyz.starinc.exa.kr.MainActivity"
+            android:name="xyz.starinc.exa.kr.MainActivity"
             android:label="@string/app_name"
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
@@ -27,7 +27,7 @@
             </intent-filter>
         </activity>
         <service
-            android:name="xyz.starinc.exa.xyz.starinc.exa.kr.fcm.MyFirebaseInstanceService"
+            android:name="xyz.starinc.exa.kr.fcm.MyFirebaseInstanceService"
             android:stopWithTask="false"
             android:permission="TODO"
             tools:ignore="ExportedService">
@@ -36,7 +36,7 @@
             </intent-filter>
         </service>
         <service
-            android:name="xyz.starinc.exa.xyz.starinc.exa.kr.fcm.MyFirebaseMessagingService"
+            android:name="xyz.starinc.exa.kr.fcm.MyFirebaseMessagingService"
             android:stopWithTask="false"
             android:permission="TODO"
             tools:ignore="ExportedService">

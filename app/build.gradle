@@ -8,8 +8,8 @@ android {
         applicationId "xyz.starinc.kater.android"
         minSdkVersion 19
         targetSdkVersion 29
-        versionCode 100
-        versionName "v1.00"
+        versionCode 101
+        versionName "v1.01"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
