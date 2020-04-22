@@ -6,12 +6,12 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
-    tools:context="xyz.starinc.kater.reader.MainActivity">
+    tools:context="xyz.starinc.exa.kr.MainActivity">
 
     <RelativeLayout
         android:id="@+id/relativeLayout"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="match_parent">
 
         <androidx.appcompat.widget.Toolbar
             android:id="@+id/toolbar"
@@ -30,7 +30,9 @@
                 android:id="@+id/newWeb"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                app:layout_behavior="@string/appbar_scrolling_view_behavior"/>
+                app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+            </im.delight.android.webview.AdvancedWebView>
 
         </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
@@ -42,6 +44,18 @@
             android:theme="@style/AppTheme.WhiteAccent"
             android:layout_centerVertical="true"
             android:layout_centerHorizontal="true" />
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:fabSize="normal"
+            android:id="@+id/fab"
+            app:backgroundTint="@android:color/holo_blue_light"
+            android:src="@drawable/ic_share"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentRight="true"
+            android:layout_margin="30dp"/>
 
     </RelativeLayout>
 

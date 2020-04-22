@@ -3,7 +3,7 @@
     <string name="action_share">分享</string>
     <string name="action_settings">設定</string>
     <string name="quit_application_prompt">是否退出卡特？</string>
-    <string name="first_notify">操作手勢：\ n \ n1。下拉即可刷新\ n2。長按圖片即可下載。</string>
+    <string name="first_notify">操作手勢：\n\n1. 下拉即可刷新\n2. 長按圖片即可下載。\n3. 長按分享按鈕以復制</string>
     <string name="i_understand">了解</string>
     <string name="close">關閉</string>
     <string name="connection_error">連接發生錯誤，請重試。</string>
@@ -16,4 +16,6 @@
     <string name="perm_needed">上傳圖片需要此權限。</string>
     <string name="yes">是的</string>
     <string name="no">拒絕</string>
+    <string name="choose_an_app">請選擇一個應用</string>
+    <string name="link_copied">網址已復制</string>
 </resources>

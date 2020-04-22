@@ -1,10 +1,12 @@
-package xyz.starinc.kater.reader;
+package xyz.starinc.exa.kr;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.app.DownloadManager;
 import android.content.BroadcastReceiver;
+import android.content.ClipData;
+import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -44,6 +46,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
+
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.List;
 import im.delight.android.webview.AdvancedWebView;
@@ -87,35 +91,35 @@ public class MainActivity extends AppCompatActivity implements AdvancedWebView.L
         networkStatDetector = new NetworkStatDetector();
         intentFilter = new IntentFilter();
         intentFilter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
+        sharedPreferences = getSharedPreferences("GlobalPreferences", 0);
+        isPermissionRequested = sharedPreferences.getBoolean("IsPermissionRequested", false);
+        isFirstRun = sharedPreferences.getBoolean("IsFirstRun", false);
 
         mPbar = findViewById(R.id.loader);
         swipeRefreshLayout = findViewById(R.id.swipeContainer);
         viewFlipper = findViewById(R.id.viewFlipper);
+        FloatingActionButton floatingActionButton = findViewById(R.id.fab);
         Button button = findViewById(R.id.button);
 
         webView = findViewById(R.id.newWeb);
         webView.setListener(this, this);
 
-        sharedPreferences = getSharedPreferences("GlobalPreferences", 0);
-
-        isPermissionRequested = sharedPreferences.getBoolean("IsPermissionRequested", false);
-        isFirstRun = sharedPreferences.getBoolean("IsFirstRun", false);
-
         webSettings = webView.getSettings();
         webSettings.setJavaScriptEnabled(true);
         webSettings.setAppCacheEnabled(true);
         webSettings.setDomStorageEnabled(true);
-
-        CookieManager cookieManager = CookieManager.getInstance();
-        cookieManager.setAcceptCookie(true);
-
+        webView.setThirdPartyCookiesEnabled(true);
+        webView.setCookiesEnabled(true);
+        webSettings.setAllowFileAccess(true);
         if(isNetworkAvailable(this)){
             webSettings.setCacheMode(WebSettings.LOAD_DEFAULT);
         }else{
             webSettings.setCacheMode(WebSettings.LOAD_CACHE_ELSE_NETWORK);
         }
 
-        webSettings.setAllowFileAccess(true);
+        CookieManager cookieManager = CookieManager.getInstance();
+        cookieManager.setAcceptCookie(true);
+
         webView.setWebChromeClient(new WebChromeClient() {
             @Override
             public boolean onCreateWindow(WebView view, boolean isDialog, boolean isUserGesture, Message resultMsg) {
@@ -125,20 +129,18 @@ public class MainActivity extends AppCompatActivity implements AdvancedWebView.L
                 resultMsg.sendToTarget();
                 return true;
             }
-
             @Override
             public void onCloseWindow(WebView window) {
                 Log.d("onCloseWindow", "called");
             }
         });
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT){
             webView.setLayerType(View.LAYER_TYPE_HARDWARE, null);
             webSettings.setAllowUniversalAccessFromFileURLs(true);
-        } else {
+        }else{
             webView.setLayerType(View.LAYER_TYPE_SOFTWARE, null);
         }
-
         webView.setWebViewClient(new WebViewClient(){
             @Override
             public void onPageStarted(WebView view, String url, Bitmap favicon) {
@@ -173,7 +175,6 @@ public class MainActivity extends AppCompatActivity implements AdvancedWebView.L
                 return true;
             }
         });
-
         webView.setOnKeyListener( new View.OnKeyListener() {
             @Override
             public boolean onKey( View v, int keyCode, KeyEvent event ) {
@@ -184,10 +185,6 @@ public class MainActivity extends AppCompatActivity implements AdvancedWebView.L
                 return false;
             }
         });
-
-        webView.setThirdPartyCookiesEnabled(true);
-        webView.setCookiesEnabled(true);
-
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
@@ -209,12 +206,39 @@ public class MainActivity extends AppCompatActivity implements AdvancedWebView.L
                 viewFlipper.showNext();
             }
         });
+        floatingActionButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                try {
+                    Intent intent = new Intent(Intent.ACTION_SEND);
+                    intent.setType("text/plain");
+                    String s = webView.getUrl();
+                    intent.putExtra(Intent.EXTRA_TEXT, s);
+                    startActivity(Intent.createChooser(intent, getString(R.string.choose_an_app)));
+                } catch(Exception e) {
+                    Log.e("error", "Failed To Share");
+                }
+            }
+        });
+        floatingActionButton.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                ClipboardManager clipboard = (ClipboardManager)getSystemService(Context.CLIPBOARD_SERVICE);
+                ClipData clip = ClipData.newPlainText("URL", webView.getUrl());
+                if(clipboard != null){
+                    clipboard.setPrimaryClip(clip);
+                }
+                Toast.makeText(MainActivity.this, R.string.link_copied, Toast.LENGTH_SHORT).show();
+                return true;
+            }
+        });
+        webView.loadUrl(url);
+        currentUrl = url;
+        registerForContextMenu(webView);
+
         if(!isPermissionRequested){
             requestPermissions();
         }
-        webView.loadUrl(url);
-        registerForContextMenu(webView);
-        currentUrl = url;
         if(!isFirstRun){
             showFirstDialog();
         }
@@ -225,9 +249,7 @@ public class MainActivity extends AppCompatActivity implements AdvancedWebView.L
 
         final WebView.HitTestResult webViewHitTestResult = webView.getHitTestResult();
 
-        if (webViewHitTestResult.getType() == WebView.HitTestResult.IMAGE_TYPE ||
-                webViewHitTestResult.getType() == WebView.HitTestResult.SRC_IMAGE_ANCHOR_TYPE) {
-
+        if (webViewHitTestResult.getType() == WebView.HitTestResult.IMAGE_TYPE || webViewHitTestResult.getType() == WebView.HitTestResult.SRC_IMAGE_ANCHOR_TYPE) {
             contextMenu.setHeaderTitle(R.string.download_image);
             contextMenu.setHeaderIcon(R.drawable.ic_download);
 
@@ -251,6 +273,16 @@ public class MainActivity extends AppCompatActivity implements AdvancedWebView.L
                         Toast.makeText(MainActivity.this,R.string.download_failed,Toast.LENGTH_SHORT).show();
                     }
                     return false;
+                }
+            });
+        }else if(webViewHitTestResult.getType() == WebView.HitTestResult.PHONE_TYPE){
+            contextMenu.add(0, 1, 0, R.string.click_to_download).setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+                @Override
+                public boolean onMenuItemClick(MenuItem menuItem) {
+                    String phoneNumber = webViewHitTestResult.getExtra();
+                    Intent intent = new Intent(Intent.ACTION_DIAL, Uri.fromParts("tel", phoneNumber, null));
+                    startActivity(intent);
+                    return true;
                 }
             });
         }

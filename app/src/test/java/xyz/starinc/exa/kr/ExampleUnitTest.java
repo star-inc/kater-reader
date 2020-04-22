@@ -1,4 +1,4 @@
-package xyz.starinc.kater.reader;
+package xyz.starinc.exa.kr;
 
 import org.junit.Test;
 

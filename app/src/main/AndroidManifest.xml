@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    package="xyz.starinc.kater.reader">
+    package="xyz.starinc.exa.kr">
 
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
     <uses-permission android:name="android.permission.INTERNET" />
-
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.CALL_PHONE" />
 
     <application
         android:allowBackup="true"
@@ -17,7 +17,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
-            android:name="xyz.starinc.kater.reader.MainActivity"
+            android:name="xyz.starinc.exa.xyz.starinc.exa.kr.MainActivity"
             android:label="@string/app_name"
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
@@ -27,7 +27,7 @@
             </intent-filter>
         </activity>
         <service
-            android:name="xyz.starinc.kater.reader.fcm.MyFirebaseInstanceService"
+            android:name="xyz.starinc.exa.xyz.starinc.exa.kr.fcm.MyFirebaseInstanceService"
             android:stopWithTask="false"
             android:permission="TODO"
             tools:ignore="ExportedService">
@@ -36,7 +36,7 @@
             </intent-filter>
         </service>
         <service
-            android:name="xyz.starinc.kater.reader.fcm.MyFirebaseMessagingService"
+            android:name="xyz.starinc.exa.xyz.starinc.exa.kr.fcm.MyFirebaseMessagingService"
             android:stopWithTask="false"
             android:permission="TODO"
             tools:ignore="ExportedService">

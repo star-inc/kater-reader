@@ -1,4 +1,4 @@
-package xyz.starinc.kater.reader.fcm;
+package xyz.starinc.exa.kr.fcm;
 
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -11,8 +11,8 @@ import android.net.Uri;
 import android.preference.PreferenceManager;
 import androidx.core.app.NotificationCompat;
 import android.util.Log;
-import xyz.starinc.kater.reader.MainActivity;
-import xyz.starinc.kater.reader.R;
+import xyz.starinc.exa.kr.MainActivity;
+import xyz.starinc.exa.kr.R;
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
 

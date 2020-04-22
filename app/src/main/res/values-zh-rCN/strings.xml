@@ -1,0 +1,21 @@
+<resources>
+    <string name="app_name">卡特 Reader</string>
+    <string name="action_share">分享</string>
+    <string name="action_settings">设定</string>
+    <string name="quit_application_prompt">是否退出卡特？ </string>
+    <string name="first_notify">操作手势：\n\n1。下拉即可刷新\n2。长按图片即可下载。\n3. 长按分享按钮以复制</string>
+    <string name="i_understand">了解</string>
+    <string name="close">关闭</string>
+    <string name="connection_error">连接发生错误，请重试。 </string>
+    <string name="reload">重新整理</string>
+    <string name="network_not_available">无网络连线。 </string>
+    <string name="download_image">下载图片</string>
+    <string name="click_to_download">点击下载</string>
+    <string name="download_success">图片下载成功</string>
+    <string name="download_failed">图片下载失败</string>
+    <string name="perm_needed">上传图片需要此权限。 </string>
+    <string name="yes">是的</string>
+    <string name="no">拒绝</string>
+    <string name="choose_an_app">请选择一个应用</string>
+    <string name="link_copied">网址已复制</string>
+</resources>
