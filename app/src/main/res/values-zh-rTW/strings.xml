@@ -1,20 +1,19 @@
 <resources>
-    <string name="app_name">Kater 卡特</string>
-	<string name="action_share">分享</string>
+    <string name="app_name">卡特 Reader</string>
+    <string name="action_share">分享</string>
     <string name="action_settings">設定</string>
     <string name="quit_application_prompt">是否退出卡特？</string>
-    <!--To be translated-->
-    <string name="first_notify">Translate yourself, please also translate MainActivity.java and activity_main.xml</string>
-    <string name="i_understand">I understand</string>
-    <string name="close">Close</string>
-    <string name="connection_error">Connection error, please try again.</string>
-    <string name="reload">Reload</string>
-    <string name="network_not_available">Network not available.</string>
-    <string name="download_image">Download Image</string>
-    <string name="click_to_download">Click to Download</string>
-    <string name="download_success">Image Downloaded Successfully</string>
-    <string name="download_failed">Image Downloaded Failed</string>
-    <string name="perm_needed">This permission is needed to upload images.</string>
-    <string name="yes">Yes</string>
-    <string name="no">No</string>
+    <string name="first_notify">操作手勢：\ n \ n1。下拉即可刷新\ n2。長按圖片即可下載。</string>
+    <string name="i_understand">了解</string>
+    <string name="close">關閉</string>
+    <string name="connection_error">連接發生錯誤，請重試。</string>
+    <string name="reload">重新整理</string>
+    <string name="network_not_available">無網絡連線。</string>
+    <string name="download_image">下載圖片</string>
+    <string name="click_to_download">點擊下載</string>
+    <string name="download_success">圖片下載成功</string>
+    <string name="download_failed">圖片下載失敗</string>
+    <string name="perm_needed">上傳圖片需要此權限。</string>
+    <string name="yes">是的</string>
+    <string name="no">拒絕</string>
 </resources>
