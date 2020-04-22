@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Kater 卡特 Reader</string>
+    <string name="app_name">Kater Reader</string>
 	<string name="action_share">Share</string>
     <string name="action_settings">Settings</string>
     <string name="quit_application_prompt">Do you want to quit application?</string>
