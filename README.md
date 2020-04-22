@@ -4,9 +4,9 @@
 
 ![logo](simple-logo.svg)
 
-## Android客戶端
+## Android簡易客戶端 (Reader)
 
-以Apache License 2.0發行程式原始碼
+以 [Apache License 2.0](LICENSE) 發行程式原始碼
 
     Copyright 2020 Star Inc.
 
