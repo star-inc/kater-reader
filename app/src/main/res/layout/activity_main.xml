@@ -69,7 +69,7 @@
             android:layout_height="wrap_content"
             android:layout_centerHorizontal="true"
             android:layout_centerVertical="true"
-            android:text="Connection error, please try again."/>
+            android:text="@string/connection_error"/>
 
         <Button
             android:id="@+id/button"
@@ -78,7 +78,7 @@
             android:layout_below="@id/textView"
             android:layout_centerHorizontal="true"
             android:layout_marginTop="15dp"
-            android:text="Reload"/>
+            android:text="@string/reload"/>
 
     </RelativeLayout>
 
