@@ -4,7 +4,7 @@
 
 ![logo](simple-logo.svg)
 
-## Android簡易客戶端 (Reader)
+## Reader (Android only)
 
 以 [Apache License 2.0](LICENSE) 發行程式原始碼
 
