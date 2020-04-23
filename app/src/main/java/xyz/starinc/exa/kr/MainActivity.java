@@ -157,14 +157,15 @@ public class MainActivity extends AppCompatActivity implements AdvancedWebView.L
             }
             @Override
             public boolean shouldOverrideUrlLoading(WebView view, String url) {
+                String host = Uri.parse(url).getHost();
                 if(url.contains("auth") && url.contains("facebook")){
                     view.loadUrl(url);
                     currentUrl = webView.getUrl();
-                }else if((url.startsWith("http://") || url.startsWith("https://")) && url.contains(".")){
+                }else if((url.startsWith("http://") || url.startsWith("https://")) && url.contains(".") && host != null && !host.equals("kater.me")){
                     Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
-                    if (Build.VERSION.SDK_INT >= 21) {
+                    if(Build.VERSION.SDK_INT >= 21){
                         intent.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY | Intent.FLAG_ACTIVITY_NEW_DOCUMENT | Intent.FLAG_ACTIVITY_MULTIPLE_TASK);
-                    } else {
+                    }else{
                         intent.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY | Intent.FLAG_ACTIVITY_MULTIPLE_TASK);
                     }
                     startActivity(intent);
