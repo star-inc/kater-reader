@@ -70,7 +70,6 @@ public class MainActivity extends AppCompatActivity implements AdvancedWebView.L
     private static final String  url = "https://kater.me/";
     private String webURL;
     private String webTitle;
-    private String currentUrl;
     private int viewFlipperStats = 0;
     public static final int RC_PERMISSIONS = 123;
 
@@ -151,7 +150,6 @@ public class MainActivity extends AppCompatActivity implements AdvancedWebView.L
                 mPbar.setVisibility(View.GONE);
                 if(url.startsWith("https://kater.me/auth/facebook?code=")){
                     view.loadUrl("https://kater.me");
-                    currentUrl = webView.getUrl();
                 }
                 super.onPageFinished(view, url);
             }
@@ -160,7 +158,6 @@ public class MainActivity extends AppCompatActivity implements AdvancedWebView.L
                 String host = Uri.parse(url).getHost();
                 if(url.contains("auth") && url.contains("facebook")){
                     view.loadUrl(url);
-                    currentUrl = webView.getUrl();
                 }else if((url.startsWith("http://") || url.startsWith("https://")) && url.contains(".") && host != null && !host.equals("kater.me")){
                     Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
                     if(Build.VERSION.SDK_INT >= 21){
@@ -171,7 +168,6 @@ public class MainActivity extends AppCompatActivity implements AdvancedWebView.L
                     startActivity(intent);
                 }else{
                     view.loadUrl(url);
-                    currentUrl = webView.getUrl();
                 }
                 return true;
             }
@@ -191,7 +187,6 @@ public class MainActivity extends AppCompatActivity implements AdvancedWebView.L
             public void onRefresh() {
                 if(isNetworkAvailable(MainActivity.this)){
                     webView.reload();
-                    currentUrl = webView.getUrl();
                 }else{
                     Toast.makeText(MainActivity.this, R.string.network_not_available, Toast.LENGTH_SHORT).show();
                 }
@@ -201,8 +196,7 @@ public class MainActivity extends AppCompatActivity implements AdvancedWebView.L
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                webView.loadUrl(currentUrl);
-                currentUrl = webView.getUrl();
+                webView.reload();
                 viewFlipperStats = 0;
                 viewFlipper.showNext();
             }
@@ -234,7 +228,6 @@ public class MainActivity extends AppCompatActivity implements AdvancedWebView.L
             }
         });
         webView.loadUrl(url);
-        currentUrl = url;
         registerForContextMenu(webView);
 
         if(!isPermissionRequested){
