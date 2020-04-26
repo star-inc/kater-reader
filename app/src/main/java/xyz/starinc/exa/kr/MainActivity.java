@@ -28,6 +28,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
 import android.webkit.CookieManager;
 import android.webkit.URLUtil;
 import android.webkit.WebChromeClient;
@@ -191,6 +192,16 @@ public class MainActivity extends AppCompatActivity implements AdvancedWebView.L
                     Toast.makeText(MainActivity.this, R.string.network_not_available, Toast.LENGTH_SHORT).show();
                 }
                 swipeRefreshLayout.setRefreshing(false);
+            }
+        });
+        swipeRefreshLayout.getViewTreeObserver().addOnScrollChangedListener(new ViewTreeObserver.OnScrollChangedListener() {
+            @Override
+            public void onScrollChanged() {
+                if(webView.getScrollY() == 0){
+                    swipeRefreshLayout.setEnabled(true);
+                }else{
+                    swipeRefreshLayout.setEnabled(false);
+                }
             }
         });
         button.setOnClickListener(new View.OnClickListener() {
