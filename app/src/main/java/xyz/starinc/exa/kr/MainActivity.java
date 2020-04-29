@@ -38,6 +38,7 @@ import android.webkit.WebViewClient;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
+import android.widget.FrameLayout;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 import android.widget.ViewFlipper;
@@ -59,8 +60,12 @@ import pub.devrel.easypermissions.EasyPermissions;
 public class MainActivity extends AppCompatActivity implements AdvancedWebView.Listener, EasyPermissions.PermissionCallbacks{
 
     private NetworkStatDetector networkStatDetector;
+    private WebChromeClient.CustomViewCallback customViewCallback;
+    private myWebChromeClient mWebChromeClient;
     private IntentFilter intentFilter;
     public AdvancedWebView webView;
+    private FrameLayout customViewContainer;
+    private View mCustomView;
     private ViewFlipper viewFlipper;
     private ProgressBar mPbar;
     private WebSettings webSettings;
@@ -88,6 +93,8 @@ public class MainActivity extends AppCompatActivity implements AdvancedWebView.L
 
         viewFlipperStats = 0;
 
+        customViewContainer = findViewById(R.id.customViewContainer);
+
         networkStatDetector = new NetworkStatDetector();
         intentFilter = new IntentFilter();
         intentFilter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
@@ -104,12 +111,15 @@ public class MainActivity extends AppCompatActivity implements AdvancedWebView.L
         webView = findViewById(R.id.newWeb);
         webView.setListener(this, this);
 
+        mWebChromeClient = new myWebChromeClient();
+
         webSettings = webView.getSettings();
         webSettings.setJavaScriptEnabled(true);
         webSettings.setAppCacheEnabled(true);
         webSettings.setDomStorageEnabled(true);
         webView.setThirdPartyCookiesEnabled(true);
         webView.setCookiesEnabled(true);
+        webView.setWebChromeClient(mWebChromeClient);
         webSettings.setAllowFileAccess(true);
         if(isNetworkAvailable(this)){
             webSettings.setCacheMode(WebSettings.LOAD_DEFAULT);
@@ -248,6 +258,12 @@ public class MainActivity extends AppCompatActivity implements AdvancedWebView.L
             showFirstDialog();
         }
     }
+    public boolean inCustomView() {
+        return (mCustomView != null);
+    }
+    public void hideCustomView() {
+        mWebChromeClient.onHideCustomView();
+    }
     @Override
     public void onCreateContextMenu(ContextMenu contextMenu, View view, ContextMenu.ContextMenuInfo contextMenuInfo){
         super.onCreateContextMenu(contextMenu, view, contextMenuInfo);
@@ -335,7 +351,13 @@ public class MainActivity extends AppCompatActivity implements AdvancedWebView.L
         webView.onPause();
         this.unregisterReceiver(networkStatDetector);
     }
-
+    @Override
+    protected void onStop() {
+        super.onStop();
+        if (inCustomView()) {
+            hideCustomView();
+        }
+    }
     @Override
     protected void onDestroy() {
         webView.onDestroy();
@@ -353,6 +375,22 @@ public class MainActivity extends AppCompatActivity implements AdvancedWebView.L
         if (!webView.canGoBack()) {
             showExitDialog();
         }
+    }
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if (keyCode == KeyEvent.KEYCODE_BACK) {
+
+            if (inCustomView()) {
+                hideCustomView();
+                return true;
+            }
+
+            if ((mCustomView == null) && webView.canGoBack()) {
+                webView.goBack();
+                return true;
+            }
+        }
+        return super.onKeyDown(keyCode, event);
     }
 
 
@@ -448,6 +486,54 @@ public class MainActivity extends AppCompatActivity implements AdvancedWebView.L
         }
         Log.i("update_status","Network is available : FALSE ");
         return false;
+    }
+    class myWebChromeClient extends WebChromeClient {
+        private Bitmap mDefaultVideoPoster;
+        private View mVideoProgressView;
+
+        @Override
+        public void onShowCustomView(View view,CustomViewCallback callback) {
+
+            // if a view already exists then immediately terminate the new one
+            if (mCustomView != null) {
+                callback.onCustomViewHidden();
+                return;
+            }
+            mCustomView = view;
+            webView.setVisibility(View.GONE);
+            customViewContainer.setVisibility(View.VISIBLE);
+            customViewContainer.addView(view);
+            customViewCallback = callback;
+        }
+
+        @Override
+        public View getVideoLoadingProgressView() {
+
+            if (mVideoProgressView == null) {
+                LayoutInflater inflater = LayoutInflater.from(MainActivity.this);
+                mVideoProgressView = inflater.inflate(R.layout.video_progress, null);
+            }
+            return mVideoProgressView;
+        }
+
+        @Override
+        public void onHideCustomView() {
+            super.onHideCustomView();    //To change body of overridden methods use File | Settings | File Templates.
+            if (mCustomView == null)
+                return;
+
+            webView.setVisibility(View.VISIBLE);
+            customViewContainer.setVisibility(View.GONE);
+
+            // Hide the custom view.
+            mCustomView.setVisibility(View.GONE);
+
+            // Remove the custom view from its container.
+            customViewContainer.removeView(mCustomView);
+            customViewCallback.onCustomViewHidden();
+
+            mCustomView = null;
+        }
     }
     private class NetworkStatDetector extends BroadcastReceiver{
         @Override
