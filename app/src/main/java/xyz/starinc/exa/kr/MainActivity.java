@@ -61,7 +61,7 @@ public class MainActivity extends AppCompatActivity implements AdvancedWebView.L
 
     private NetworkStatDetector networkStatDetector;
     private WebChromeClient.CustomViewCallback customViewCallback;
-    private myWebChromeClient mWebChromeClient;
+    private webChromeClient mWebChromeClient;
     private IntentFilter intentFilter;
     public AdvancedWebView webView;
     private FrameLayout customViewContainer;
@@ -111,15 +111,12 @@ public class MainActivity extends AppCompatActivity implements AdvancedWebView.L
         webView = findViewById(R.id.newWeb);
         webView.setListener(this, this);
 
-        mWebChromeClient = new myWebChromeClient();
-
         webSettings = webView.getSettings();
         webSettings.setJavaScriptEnabled(true);
         webSettings.setAppCacheEnabled(true);
         webSettings.setDomStorageEnabled(true);
         webView.setThirdPartyCookiesEnabled(true);
         webView.setCookiesEnabled(true);
-        webView.setWebChromeClient(mWebChromeClient);
         webSettings.setAllowFileAccess(true);
         if(isNetworkAvailable(this)){
             webSettings.setCacheMode(WebSettings.LOAD_DEFAULT);
@@ -130,20 +127,8 @@ public class MainActivity extends AppCompatActivity implements AdvancedWebView.L
         CookieManager cookieManager = CookieManager.getInstance();
         cookieManager.setAcceptCookie(true);
 
-        webView.setWebChromeClient(new WebChromeClient() {
-            @Override
-            public boolean onCreateWindow(WebView view, boolean isDialog, boolean isUserGesture, Message resultMsg) {
-                AdvancedWebView newWebView = new AdvancedWebView(MainActivity.this);
-                WebView.WebViewTransport transport = (WebView.WebViewTransport) resultMsg.obj;
-                transport.setWebView(newWebView);
-                resultMsg.sendToTarget();
-                return true;
-            }
-            @Override
-            public void onCloseWindow(WebView window) {
-                Log.d("onCloseWindow", "called");
-            }
-        });
+        mWebChromeClient = new webChromeClient();
+        webView.setWebChromeClient(mWebChromeClient);
 
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT){
             webView.setLayerType(View.LAYER_TYPE_HARDWARE, null);
@@ -258,11 +243,9 @@ public class MainActivity extends AppCompatActivity implements AdvancedWebView.L
             showFirstDialog();
         }
     }
+
     public boolean inCustomView() {
         return (mCustomView != null);
-    }
-    public void hideCustomView() {
-        mWebChromeClient.onHideCustomView();
     }
     @Override
     public void onCreateContextMenu(ContextMenu contextMenu, View view, ContextMenu.ContextMenuInfo contextMenuInfo){
@@ -355,7 +338,7 @@ public class MainActivity extends AppCompatActivity implements AdvancedWebView.L
     protected void onStop() {
         super.onStop();
         if (inCustomView()) {
-            hideCustomView();
+            mWebChromeClient.onHideCustomView();
         }
     }
     @Override
@@ -381,7 +364,7 @@ public class MainActivity extends AppCompatActivity implements AdvancedWebView.L
         if (keyCode == KeyEvent.KEYCODE_BACK) {
 
             if (inCustomView()) {
-                hideCustomView();
+                mWebChromeClient.onHideCustomView();
                 return true;
             }
 
@@ -487,12 +470,25 @@ public class MainActivity extends AppCompatActivity implements AdvancedWebView.L
         Log.i("update_status","Network is available : FALSE ");
         return false;
     }
-    class myWebChromeClient extends WebChromeClient {
-        private Bitmap mDefaultVideoPoster;
+    private class webChromeClient extends WebChromeClient{
+
         private View mVideoProgressView;
 
         @Override
-        public void onShowCustomView(View view,CustomViewCallback callback) {
+        public boolean onCreateWindow(WebView view, boolean isDialog, boolean isUserGesture, Message resultMsg) {
+            AdvancedWebView newWebView = new AdvancedWebView(MainActivity.this);
+            WebView.WebViewTransport transport = (WebView.WebViewTransport) resultMsg.obj;
+            transport.setWebView(newWebView);
+            resultMsg.sendToTarget();
+            return true;
+        }
+        @Override
+        public void onCloseWindow(WebView window) {
+            Log.d("onCloseWindow", "called");
+        }
+
+        @Override
+        public void onShowCustomView(View view, WebChromeClient.CustomViewCallback callback) {
 
             // if a view already exists then immediately terminate the new one
             if (mCustomView != null) {
