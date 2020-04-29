@@ -12,6 +12,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.content.pm.ActivityInfo;
 import android.graphics.Bitmap;
 import android.net.ConnectivityManager;
 import android.net.NetworkCapabilities;
@@ -83,7 +84,7 @@ public class MainActivity extends AppCompatActivity implements AdvancedWebView.L
             Manifest.permission.WRITE_EXTERNAL_STORAGE
     };
 
-    @SuppressLint("SetJavaScriptEnabled")
+    @SuppressLint({"SetJavaScriptEnabled", "SourceLockedOrientationActivity"})
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -235,6 +236,7 @@ public class MainActivity extends AppCompatActivity implements AdvancedWebView.L
         });
         webView.loadUrl(url);
         registerForContextMenu(webView);
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
         if(!isPermissionRequested){
             requestPermissions();
@@ -487,6 +489,7 @@ public class MainActivity extends AppCompatActivity implements AdvancedWebView.L
             Log.d("onCloseWindow", "called");
         }
 
+        @SuppressLint("SourceLockedOrientationActivity")
         @Override
         public void onShowCustomView(View view, WebChromeClient.CustomViewCallback callback) {
 
@@ -500,6 +503,7 @@ public class MainActivity extends AppCompatActivity implements AdvancedWebView.L
             customViewContainer.setVisibility(View.VISIBLE);
             customViewContainer.addView(view);
             customViewCallback = callback;
+            MainActivity.this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
         }
 
         @Override
@@ -512,6 +516,7 @@ public class MainActivity extends AppCompatActivity implements AdvancedWebView.L
             return mVideoProgressView;
         }
 
+        @SuppressLint("SourceLockedOrientationActivity")
         @Override
         public void onHideCustomView() {
             super.onHideCustomView();    //To change body of overridden methods use File | Settings | File Templates.
@@ -529,6 +534,7 @@ public class MainActivity extends AppCompatActivity implements AdvancedWebView.L
             customViewCallback.onCustomViewHidden();
 
             mCustomView = null;
+            MainActivity.this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         }
     }
     private class NetworkStatDetector extends BroadcastReceiver{
