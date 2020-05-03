@@ -12,8 +12,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
-import android.content.pm.ActivityInfo;
-import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.net.ConnectivityManager;
 import android.net.NetworkCapabilities;
@@ -168,16 +166,6 @@ public class MainActivity extends AppCompatActivity implements AdvancedWebView.L
                     view.loadUrl(url);
                 }
                 return true;
-            }
-        });
-        webView.setOnKeyListener( new View.OnKeyListener() {
-            @Override
-            public boolean onKey( View v, int keyCode, KeyEvent event ) {
-                if ((keyCode == KeyEvent.KEYCODE_BACK) && webView.canGoBack()) {
-                    webView.goBack();
-                    return true;
-                }
-                return false;
             }
         });
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
@@ -359,7 +347,9 @@ public class MainActivity extends AppCompatActivity implements AdvancedWebView.L
 
     @Override
     public void onBackPressed() {
-        if (!webView.canGoBack()) {
+        if (webView.canGoBack()) {
+            webView.goBack();
+        }else{
             showExitDialog();
         }
     }
@@ -377,13 +367,11 @@ public class MainActivity extends AppCompatActivity implements AdvancedWebView.L
     }
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
-        if (keyCode == KeyEvent.KEYCODE_BACK) {
-
+        if (keyCode ==  KeyEvent.KEYCODE_BACK) {
             if (inCustomView()) {
                 mWebChromeClient.onHideCustomView();
                 return true;
             }
-
             if ((mCustomView == null) && webView.canGoBack()) {
                 webView.goBack();
                 return true;
@@ -391,18 +379,14 @@ public class MainActivity extends AppCompatActivity implements AdvancedWebView.L
         }
         return super.onKeyDown(keyCode, event);
     }
-
-
     @Override
     public void onPageStarted(String url, Bitmap favicon) {
     }
-
     @Override
     public void onPageFinished(String url) {
 		webURL = webView.getUrl();
         webTitle = webView.getTitle();
     }
-
     @Override
     public void onPageError(int errorCode, String description, String failingUrl) {
         webView.loadUrl("about:blank");
@@ -411,30 +395,23 @@ public class MainActivity extends AppCompatActivity implements AdvancedWebView.L
             viewFlipper.showNext();
         }
     }
-
     @Override
     public void onDownloadRequested(String url, String suggestedFilename, String mimeType, long contentLength, String contentDisposition, String userAgent) {
-
     }
-
     @Override
     public void onExternalPageRequest(String url) {
-
     }
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-
         // Forward results to EasyPermissions
         EasyPermissions.onRequestPermissionsResult(requestCode, permissions, grantResults, this);
     }
-
     @Override
     public void onPermissionsGranted(int requestCode, @NonNull List<String> list) {
         // Some permissions have been granted
         // ...
     }
-
     @Override
     public void onPermissionsDenied(int requestCode, @NonNull List<String> perms) {
         // Some permissions have been denied
