@@ -234,7 +234,9 @@ public class MainActivity extends AppCompatActivity implements AdvancedWebView.L
                 return true;
             }
         });
-        webView.loadUrl(url);
+        if (savedInstanceState == null) {
+            webView.loadUrl(url);
+        }
         registerForContextMenu(webView);
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
@@ -360,6 +362,17 @@ public class MainActivity extends AppCompatActivity implements AdvancedWebView.L
         if (!webView.canGoBack()) {
             showExitDialog();
         }
+    }
+    @Override
+    protected void onSaveInstanceState(@NonNull Bundle outState ) {
+        super.onSaveInstanceState(outState);
+        webView.saveState(outState);
+    }
+
+    @Override
+    protected void onRestoreInstanceState(@NonNull Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+        webView.restoreState(savedInstanceState);
     }
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
@@ -503,7 +516,7 @@ public class MainActivity extends AppCompatActivity implements AdvancedWebView.L
             customViewContainer.setVisibility(View.VISIBLE);
             customViewContainer.addView(view);
             customViewCallback = callback;
-            MainActivity.this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         }
 
         @Override
@@ -516,7 +529,6 @@ public class MainActivity extends AppCompatActivity implements AdvancedWebView.L
             return mVideoProgressView;
         }
 
-        @SuppressLint("SourceLockedOrientationActivity")
         @Override
         public void onHideCustomView() {
             super.onHideCustomView();    //To change body of overridden methods use File | Settings | File Templates.
@@ -534,7 +546,6 @@ public class MainActivity extends AppCompatActivity implements AdvancedWebView.L
             customViewCallback.onCustomViewHidden();
 
             mCustomView = null;
-            MainActivity.this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         }
     }
     private class NetworkStatDetector extends BroadcastReceiver{

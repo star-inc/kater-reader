@@ -17,6 +17,6 @@
     <string name="yes">是的</string>
     <string name="no">拒絕</string>
     <string name="choose_an_app">請選擇一個應用</string>
-    <string name="link_copied">網址已復制</string>
+    <string name="link_copied">網址已複製</string>
     <string name="loading">載入中...</string>
 </resources>
