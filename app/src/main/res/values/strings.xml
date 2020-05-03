@@ -3,7 +3,7 @@
 	<string name="action_share">Share</string>
     <string name="action_settings">Settings</string>
     <string name="quit_application_prompt">Do you want to quit application?</string>
-    <string name="first_notify">Gesture(Might add more in future):\n\n1. Pull down to refresh\n2. Long click image to download.\n3. Long click share button to copy current page url</string>
+    <string name="first_notify">Gesture(Might add more in future):\n\n1. Long click image to download.\n2. Long click share button to copy current page url</string>
     <string name="i_understand">I understand</string>
     <string name="close">Close</string>
     <string name="connection_error">Connection error, please try again.</string>
