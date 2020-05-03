@@ -28,10 +28,8 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.ViewTreeObserver;
 import android.webkit.CookieManager;
 import android.webkit.URLUtil;
-import android.webkit.ValueCallback;
 import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
@@ -49,7 +47,6 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
-import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 
 import java.util.List;
@@ -70,7 +67,6 @@ public class MainActivity extends AppCompatActivity implements AdvancedWebView.L
     private ViewFlipper viewFlipper;
     private ProgressBar mPbar;
     private WebSettings webSettings;
-    private SwipeRefreshLayout swipeRefreshLayout;
     private SharedPreferences sharedPreferences;
     boolean isPermissionRequested = false;
     boolean isFirstRun = false;
@@ -104,7 +100,6 @@ public class MainActivity extends AppCompatActivity implements AdvancedWebView.L
         isFirstRun = sharedPreferences.getBoolean("IsFirstRun", false);
 
         mPbar = findViewById(R.id.loader);
-        swipeRefreshLayout = findViewById(R.id.swipeContainer);
         viewFlipper = findViewById(R.id.viewFlipper);
         ImageView imageView = findViewById(R.id.imageView);
         ImageView imageView2 = findViewById(R.id.imageView2);
@@ -170,27 +165,6 @@ public class MainActivity extends AppCompatActivity implements AdvancedWebView.L
                 return true;
             }
         });
-        /*swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
-            @Override
-            public void onRefresh() {
-                if(isNetworkAvailable(MainActivity.this)){
-                    webView.reload();
-                }else{
-                    Toast.makeText(MainActivity.this, R.string.network_not_available, Toast.LENGTH_SHORT).show();
-                }
-                swipeRefreshLayout.setRefreshing(false);
-            }
-        });
-        swipeRefreshLayout.getViewTreeObserver().addOnScrollChangedListener(new ViewTreeObserver.OnScrollChangedListener() {
-            @Override
-            public void onScrollChanged() {
-                if(webView.getScrollY() == 0){
-                    swipeRefreshLayout.setEnabled(true);
-                }else{
-                    swipeRefreshLayout.setEnabled(false);
-                }
-            }
-        });*/
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

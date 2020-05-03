@@ -20,21 +20,13 @@
             android:background="?attr/colorPrimary"
             app:popupTheme="@style/AppTheme.NoActionBar" />
 
-        <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
-            android:id="@+id/swipeContainer"
+        <im.delight.android.webview.AdvancedWebView
+            android:id="@+id/newWeb"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
-            <im.delight.android.webview.AdvancedWebView
-                android:id="@+id/newWeb"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                app:layout_behavior="@string/appbar_scrolling_view_behavior">
-
-            </im.delight.android.webview.AdvancedWebView>
-
-        </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+        </im.delight.android.webview.AdvancedWebView>
 
         <FrameLayout
             android:id="@+id/customViewContainer"
