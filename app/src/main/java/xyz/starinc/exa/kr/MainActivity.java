@@ -13,6 +13,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
+import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.net.ConnectivityManager;
 import android.net.NetworkCapabilities;
@@ -84,7 +85,7 @@ public class MainActivity extends AppCompatActivity implements AdvancedWebView.L
             Manifest.permission.WRITE_EXTERNAL_STORAGE
     };
 
-    @SuppressLint({"SetJavaScriptEnabled", "SourceLockedOrientationActivity"})
+    @SuppressLint("SetJavaScriptEnabled")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -238,7 +239,6 @@ public class MainActivity extends AppCompatActivity implements AdvancedWebView.L
             webView.loadUrl(url);
         }
         registerForContextMenu(webView);
-        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
         if(!isPermissionRequested){
             requestPermissions();
@@ -363,6 +363,7 @@ public class MainActivity extends AppCompatActivity implements AdvancedWebView.L
             showExitDialog();
         }
     }
+
     @Override
     protected void onSaveInstanceState(@NonNull Bundle outState ) {
         super.onSaveInstanceState(outState);
@@ -502,7 +503,6 @@ public class MainActivity extends AppCompatActivity implements AdvancedWebView.L
             Log.d("onCloseWindow", "called");
         }
 
-        @SuppressLint("SourceLockedOrientationActivity")
         @Override
         public void onShowCustomView(View view, WebChromeClient.CustomViewCallback callback) {
 
@@ -516,7 +516,6 @@ public class MainActivity extends AppCompatActivity implements AdvancedWebView.L
             customViewContainer.setVisibility(View.VISIBLE);
             customViewContainer.addView(view);
             customViewCallback = callback;
-            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         }
 
         @Override
