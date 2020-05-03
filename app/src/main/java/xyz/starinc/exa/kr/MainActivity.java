@@ -31,6 +31,7 @@ import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.webkit.CookieManager;
 import android.webkit.URLUtil;
+import android.webkit.ValueCallback;
 import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
@@ -39,6 +40,7 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 import android.widget.ViewFlipper;
@@ -49,7 +51,6 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.List;
 import im.delight.android.webview.AdvancedWebView;
@@ -105,7 +106,8 @@ public class MainActivity extends AppCompatActivity implements AdvancedWebView.L
         mPbar = findViewById(R.id.loader);
         swipeRefreshLayout = findViewById(R.id.swipeContainer);
         viewFlipper = findViewById(R.id.viewFlipper);
-        FloatingActionButton floatingActionButton = findViewById(R.id.fab);
+        ImageView imageView = findViewById(R.id.imageView);
+        ImageView imageView2 = findViewById(R.id.imageView2);
         Button button = findViewById(R.id.button);
 
         webView = findViewById(R.id.newWeb);
@@ -168,7 +170,7 @@ public class MainActivity extends AppCompatActivity implements AdvancedWebView.L
                 return true;
             }
         });
-        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+        /*swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
                 if(isNetworkAvailable(MainActivity.this)){
@@ -188,7 +190,7 @@ public class MainActivity extends AppCompatActivity implements AdvancedWebView.L
                     swipeRefreshLayout.setEnabled(false);
                 }
             }
-        });
+        });*/
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -197,7 +199,7 @@ public class MainActivity extends AppCompatActivity implements AdvancedWebView.L
                 viewFlipper.showNext();
             }
         });
-        floatingActionButton.setOnClickListener(new View.OnClickListener() {
+        imageView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 try {
@@ -211,7 +213,7 @@ public class MainActivity extends AppCompatActivity implements AdvancedWebView.L
                 }
             }
         });
-        floatingActionButton.setOnLongClickListener(new View.OnLongClickListener() {
+        imageView.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
                 ClipboardManager clipboard = (ClipboardManager)getSystemService(Context.CLIPBOARD_SERVICE);
@@ -221,6 +223,16 @@ public class MainActivity extends AppCompatActivity implements AdvancedWebView.L
                 }
                 Toast.makeText(MainActivity.this, R.string.link_copied, Toast.LENGTH_SHORT).show();
                 return true;
+            }
+        });
+        imageView2.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(isNetworkAvailable(MainActivity.this)){
+                    webView.reload();
+                }else{
+                    Toast.makeText(MainActivity.this, R.string.network_not_available, Toast.LENGTH_SHORT).show();
+                }
             }
         });
         if (savedInstanceState == null) {
