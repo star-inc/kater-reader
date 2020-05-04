@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">卡特 Reader</string>
+    <string name="app_name">卡特 Lite</string>
     <string name="action_share">分享</string>
     <string name="action_settings">设定</string>
     <string name="quit_application_prompt">是否退出卡特？ </string>
