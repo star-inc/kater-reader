@@ -48,7 +48,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
 
-
 import java.util.List;
 import im.delight.android.webview.AdvancedWebView;
 import pub.devrel.easypermissions.AfterPermissionGranted;
@@ -203,6 +202,7 @@ public class MainActivity extends AppCompatActivity implements AdvancedWebView.L
             @Override
             public void onClick(View v) {
                 if(isNetworkAvailable(MainActivity.this)){
+                    mPbar.setVisibility(View.VISIBLE);
                     webView.reload();
                 }else{
                     Toast.makeText(MainActivity.this, R.string.network_not_available, Toast.LENGTH_SHORT).show();
