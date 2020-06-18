@@ -11,6 +11,7 @@
     <string name="network_not_available">Network not available.</string>
     <string name="download_image">Download Image</string>
     <string name="click_to_download">Click to Download</string>
+    <string name="click_to_dial">Click to Dial</string>
     <string name="download_success">Image Downloaded Successfully</string>
     <string name="download_failed">Image Downloaded Failed</string>
     <string name="perm_needed">This permission is needed to upload images.</string>

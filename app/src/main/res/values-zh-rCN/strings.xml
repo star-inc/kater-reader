@@ -11,6 +11,7 @@
     <string name="network_not_available">无网络连线。 </string>
     <string name="download_image">下载图片</string>
     <string name="click_to_download">点击下载</string>
+    <string name="click_to_dial">点击拨打</string>
     <string name="download_success">图片下载成功</string>
     <string name="download_failed">图片下载失败</string>
     <string name="perm_needed">上传图片需要此权限。 </string>

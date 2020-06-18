@@ -19,6 +19,7 @@ import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Message;
 import android.util.Log;
 import android.view.ContextMenu;
@@ -245,6 +246,7 @@ public class MainActivity extends AppCompatActivity implements AdvancedWebView.L
                         DownloadManager.Request mRequest = new DownloadManager.Request(Uri.parse(DownloadImageURL));
                         mRequest.allowScanningByMediaScanner();
                         mRequest.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
+                        mRequest.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, URLUtil.guessFileName(DownloadImageURL, null, null));
                         DownloadManager mDownloadManager = (DownloadManager) getSystemService(DOWNLOAD_SERVICE);
                         if(mDownloadManager != null){
                             mDownloadManager.enqueue(mRequest);
@@ -258,7 +260,7 @@ public class MainActivity extends AppCompatActivity implements AdvancedWebView.L
                 }
             });
         }else if(webViewHitTestResult.getType() == WebView.HitTestResult.PHONE_TYPE){
-            contextMenu.add(0, 1, 0, R.string.click_to_download).setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+            contextMenu.add(0, 1, 0, R.string.click_to_dial).setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
                 @Override
                 public boolean onMenuItemClick(MenuItem menuItem) {
                     String phoneNumber = webViewHitTestResult.getExtra();
