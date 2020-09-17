@@ -1,0 +1,20 @@
+{
+  "version": 1,
+  "artifactType": {
+    "type": "APK",
+    "kind": "Directory"
+  },
+  "applicationId": "xyz.starinc.exa.kr",
+  "variantName": "release",
+  "elements": [
+    {
+      "type": "SINGLE",
+      "filters": [],
+      "properties": [],
+      "versionCode": 117,
+      "versionName": "v1.17",
+      "enabled": true,
+      "outputFile": "app-release.apk"
+    }
+  ]
+}
